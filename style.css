@@ -212,6 +212,36 @@ button:active {
     font-size: 14px;
 }
 
+/* Viewer header with copy button */
+.viewer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.viewer-header h2 {
+    margin-bottom: 0;
+}
+
+.copy-btn {
+    padding: 8px 16px;
+    font-size: 14px;
+    background: #667eea;
+    transition: all 0.3s ease;
+}
+
+.copy-btn:hover {
+    background: #5568d3;
+    transform: translateY(-2px);
+}
+
+.copy-btn:active {
+    transform: translateY(0);
+}
+
 /* ============================================
    RESPONSIVE DESIGN - MOBILE & TABLET
    ============================================ */
@@ -356,6 +386,16 @@ button:active {
     
     textarea {
         min-height: 100px;
+    }
+    
+    .viewer-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .copy-btn {
+        width: 100%;
+        margin-bottom: 10px;
     }
 }
 

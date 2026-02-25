@@ -8,6 +8,7 @@ const fileViewer = document.getElementById('fileViewer');
 const refreshBtn = document.getElementById('refreshBtn');
 const modeIndicator = document.getElementById('modeIndicator');
 const modeText = document.getElementById('modeText');
+const copyBtn = document.getElementById('copyBtn');
 
 // Detect mode: server or local
 let isServerMode = false;
@@ -322,26 +323,38 @@ async function viewFileFromServer(filename) {
         const data = await response.json();
         
         if (data.success) {
+            currentFileContent = data.content; // Store content for copying
             fileViewer.innerHTML = `<strong>File: ${data.filename}</strong><br><br>${data.content}`;
+            copyBtn.style.display = 'inline-block'; // Show copy button
         } else {
             showMessage(data.error || 'Failed to load file', 'error');
+            currentFileContent = ''; // Clear content
+            copyBtn.style.display = 'none'; // Hide copy button
         }
     } catch (error) {
         showMessage('Error: ' + error.message, 'error');
+        currentFileContent = ''; // Clear content
+        copyBtn.style.display = 'none'; // Hide copy button
     }
 }
 
-// View file from localStorage
+// View file from localStorage 
 function viewFileFromLocalStorage(filename) {
     try {
         const files = JSON.parse(localStorage.getItem('textFiles') || '{}');
         if (files[filename]) {
+            currentFileContent = files[filename].content; // Store content for copying
             fileViewer.innerHTML = `<strong>File: ${filename}</strong><br><br>${files[filename].content}`;
+            copyBtn.style.display = 'inline-block'; // Show copy button
         } else {
             showMessage('File not found', 'error');
+            currentFileContent = ''; // Clear content
+            copyBtn.style.display = 'none'; // Hide copy button
         }
     } catch (error) {
         showMessage('Error: ' + error.message, 'error');
+        currentFileContent = ''; // Clear content
+        copyBtn.style.display = 'none'; // Hide copy button
     }
 }
 
@@ -414,6 +427,8 @@ async function deleteFileFromServer(filename) {
             showMessage(`File "${filename}" deleted successfully!`, 'success');
             loadFiles();
             fileViewer.textContent = 'Select a file to view its content';
+            currentFileContent = ''; // Clear content
+            copyBtn.style.display = 'none'; // Hide copy button
         } else {
             showMessage(data.error || 'Failed to delete file', 'error');
         }
@@ -432,9 +447,67 @@ function deleteFileFromLocalStorage(filename) {
         showMessage(`File "${filename}" deleted successfully!`, 'success');
         loadFiles();
         fileViewer.textContent = 'Select a file to view its content';
+        currentFileContent = ''; // Clear content
+        copyBtn.style.display = 'none'; // Hide copy button
     } catch (error) {
         showMessage('Error: ' + error.message, 'error');
     }
+}
+
+// Copy file content to clipboard
+copyBtn.addEventListener('click', async () => {
+    if (!currentFileContent) {
+        showMessage('No content to copy', 'error');
+        return;
+    }
+    
+    try {
+        await navigator.clipboard.writeText(currentFileContent);
+        
+        // Visual feedback
+        const originalText = copyBtn.innerHTML;
+        copyBtn.innerHTML = '✓ Copied!';
+        copyBtn.style.background = '#28a745';
+        
+        setTimeout(() => {
+            copyBtn.innerHTML = originalText;
+            copyBtn.style.background = '#667eea';
+        }, 2000);
+        
+        showMessage('Content copied to clipboard!', 'success');
+    } catch (error) {
+        // Fallback for older browsers
+        fallbackCopyToClipboard(currentFileContent);
+    }
+});
+
+// Fallback copy method for older browsers
+function fallbackCopyToClipboard(text) {
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    textArea.style.position = 'fixed';
+    textArea.style.left = '-9999px';
+    document.body.appendChild(textArea);
+    textArea.select();
+    
+    try {
+        document.execCommand('copy');
+        
+        const originalText = copyBtn.innerHTML;
+        copyBtn.innerHTML = '✓ Copied!';
+        copyBtn.style.background = '#28a745';
+        
+        setTimeout(() => {
+            copyBtn.innerHTML = originalText;
+            copyBtn.style.background = '#667eea';
+        }, 2000);
+        
+        showMessage('Content copied to clipboard!', 'success');
+    } catch (error) {
+        showMessage('Failed to copy content', 'error');
+    }
+    
+    document.body.removeChild(textArea);
 }
 
 // Refresh button
