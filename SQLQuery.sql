@@ -1,0 +1,103 @@
+-- TABLES:
+-- 
+-- 
+-- - USERS
+-- - PROFILES > USERS
+-- - PROFILE SETTINGS > USERS
+-- - USER SESSIONS > USERS
+-- 
+-- - DOCUMENTS
+-- - DOCUMENT TYPES
+
+USE master
+GO
+
+CREATE DATABASE TextStorage
+ON
+(
+	NAME = TextStorage,
+	FILENAME = 'L:\Local text storage\Database\TextStorage',
+	SIZE = 10,
+	MAXSIZE = 100,
+	FILEGROWTH = 5
+)
+GO
+
+USE TextStorage
+GO
+
+CREATE SCHEMA [CONTENT]
+GO
+CREATE SCHEMA [ACCOUNT]
+GO
+
+CREATE TABLE [ACCOUNT].[Users]
+(
+	[ID]				INT NOT NULL PRIMARY KEY IDENTITY(1000,1), 
+	[Username]			VARCHAR(50) NOT NULL,
+	[Email]				VARCHAR(200) NULL,
+	[PasswordHash]		VARBINARY(64) NOT NULL,
+	[PasswordSalt]		VARBINARY(64) NOT NULL,
+	[PrivateKey]		VARBINARY(64) NOT NULL,
+
+	[CreatedOn]			DATETIME2 NOT NULL DEFAULT(SYSUTCDATETIME()),
+)
+GO
+
+CREATE TABLE [ACCOUNT].[Profiles]
+(
+	[ID]				INT NOT NULL PRIMARY KEY IDENTITY(1000,2),
+	[FirstName]			NVARCHAR(50) NULL,
+	[LastName]			NVARCHAR(50) NULL,
+	[Avatar]			NVARCHAR(MAX) NULL,
+	[EditedOn]			DATETIME2 NULL,
+
+	[UserID]			INT NOT NULL UNIQUE,
+	
+	CONSTRAINT FK_Profiles_Users
+		FOREIGN KEY (UserID) REFERENCES [ACCOUNT].[Users](ID),
+)
+GO
+
+CREATE TABLE [ACCOUNT].[AccountSettings]
+(
+	-- I don't have any idea about account settngs right now maybe another time.
+
+	[ID]				INT NOT NULL PRIMARY KEY IDENTITY,
+	[UserID]			INT NOT NULL UNIQUE,
+	
+	CONSTRAINT FK_AccountSettings_Users
+		 FOREIGN KEY (UserID) REFERENCES [ACCOUNT].[Users](ID)
+		 ON DELETE CASCADE,
+)
+GO
+
+CREATE TABLE [CONTENT].[DocumentTypes]
+(
+	[ID]				INT NOT NULL PRIMARY KEY IDENTITY,
+	[Name]				NVARCHAR(20) NOT NULL,
+	[Extension]			NVARCHAR(15) NOT NULL,
+)
+GO
+
+CREATE TABLE [CONTENT].[Documents]
+(
+	[ID]				INT NOT NULL PRIMARY KEY IDENTITY,
+	[Name]				NVARCHAR(100) NOT NULL,
+	[Description]		NVARCHAR(700) NULL,
+	[FilePath]			VARCHAR(MAX) NOT NULL,
+	[CreatedOn]			DATETIME2 NOT NULL DEFAULT(SYSUTCDATETIME()),
+	[EditedOn]			DATETIME2 NULL,
+	[DeletedOn]			DATETIME2 NULL,
+	[IsDeleted]			BIT NOT NULL DEFAULT(0),
+
+	[DocumentTypeID]	INT NOT NULL,
+	[BelongsTo]			INT NOT NULL,
+
+	CONSTRAINT FK_Documents_DocumentTypes
+		FOREIGN KEY (DocumentTypeID) REFERENCES [CONTENT].[DocumentTypes](ID),
+	CONSTRAINT FK_Documents_Users
+		 FOREIGN KEY (BelongsTo) REFERENCES [ACCOUNT].[Users](ID)
+		 ON DELETE CASCADE,
+)
+GO
