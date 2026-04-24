@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Browser;
 
-using TextStorage_WebApp;
+using TextStorage;
 
 internal sealed partial class Program
 {

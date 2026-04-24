@@ -1,6 +1,6 @@
 ﻿using Avalonia.Controls;
 
-namespace TextStorage_WebApp.Views;
+namespace TextStorage.Views;
 
 public partial class MainView : UserControl
 {

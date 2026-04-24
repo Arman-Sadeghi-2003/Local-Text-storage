@@ -1,6 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 
-namespace TextStorage_WebApp.ViewModels;
+namespace TextStorage.ViewModels;
 
 public class ViewModelBase : ObservableObject
 {

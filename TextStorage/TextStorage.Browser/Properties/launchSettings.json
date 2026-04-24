@@ -1,6 +1,6 @@
 {
     "profiles": {
-    "TextStorage_WebApp.Browser": {
+    "TextStorage.Browser": {
         "commandName": "Project",
         "launchBrowser": true,
         "environmentVariables": {

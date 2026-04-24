@@ -1,4 +1,4 @@
-﻿namespace TextStorage_WebApp.ViewModels;
+﻿namespace TextStorage.ViewModels;
 
 public partial class MainViewModel : ViewModelBase
 {

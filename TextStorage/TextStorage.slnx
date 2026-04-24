@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="TextStorage.Browser/TextStorage.Browser.csproj" />
+  <Project Path="TextStorage.Desktop/TextStorage.Desktop.csproj" />
+  <Project Path="TextStorage/TextStorage.csproj" />
+</Solution>
