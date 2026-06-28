@@ -1,7 +1,7 @@
 ﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Data.Core.Plugins;
+using Avalonia.Input.Platform;
 using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -80,17 +80,14 @@ public partial class App : Application
 
 		// Line below is needed to remove Avalonia data validation.
 		// Without this line you will get duplicate validations from both Avalonia and CT
-		BindingPlugins.DataValidators.RemoveAt(0);
-		Log.Information("1");
+		//BindingPlugins.DataValidators.RemoveAt(0);
 
 		var locator = new ViewLocator();
 		DataTemplates.Add(locator);
-		Log.Information("2");
 
 		// Setup Dependency Injection
 		var services = new ServiceCollection();
 		services.AddCommonServices();
-		Log.Information("3");
 
 		provider = services.BuildServiceProvider();
 

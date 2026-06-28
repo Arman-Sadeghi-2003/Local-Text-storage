@@ -12,5 +12,8 @@
     <vm:MainViewModel />
   </Design.DataContext>
 
-  <TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+    <Grid>
+		<TextBox Width="300" Height="150"/>
+    </Grid>
+
 </UserControl>
