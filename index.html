@@ -3,43 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
     <title>Text File Storage</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <h1>Text File Storage</h1>
-        
-        <!-- Mode indicator -->
-        <div id="modeIndicator" class="mode-indicator">
-            <span id="modeText">Detecting mode...</span>
-        </div>
+    <a class="skip-link" href="#main">Skip to content</a>
 
-        <!-- Form to save text -->
-        <div class="form-section">
-            <h2>Save New Text File</h2>
-            <form id="saveForm">
-                <input type="text" id="filename" placeholder="Enter filename" required>
-                <textarea id="textContent" placeholder="Enter your text here..." required></textarea>
-                <button type="submit">Save File</button>
-            </form>
-            <div id="message"></div>
-        </div>
-
-        <!-- List of saved files -->
-        <div class="files-section">
-            <h2>Saved Files</h2>
-            <button id="refreshBtn">Refresh List</button>
-            <div id="filesList"></div>
-        </div>
-
-        <!-- File viewer -->
-        <div class="viewer-section">
-            <div class="viewer-header">
-                <h2>File Content</h2>
-                <button id="copyBtn" class="copy-btn" style="display: none;">📋 Copy</button>
+    <header class="topbar">
+        <div class="topbar-inner">
+            <div class="brand">
+                <span class="brand-mark" aria-hidden="true">📄</span>
+                <h1>Text File Storage</h1>
             </div>
-            <div id="fileViewer">Select a file to view its content</div>
+
+            <div class="topbar-actions">
+                <span id="modeIndicator" class="mode-pill" title="Detecting where files are stored">
+                    <span class="mode-dot" aria-hidden="true"></span>
+                    <span id="modeText">Detecting mode…</span>
+                </span>
+                <button id="themeToggle" class="icon-btn" type="button" aria-label="Switch colour theme" title="Switch colour theme">
+                    <span id="themeIcon" aria-hidden="true">🌙</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main id="main" class="layout">
+        <!-- Sidebar: file list -->
+        <aside class="sidebar" aria-label="Saved files">
+            <div class="sidebar-head">
+                <h2>Files <span id="fileCount" class="badge">0</span></h2>
+                <button id="refreshBtn" class="icon-btn" type="button" aria-label="Refresh file list" title="Refresh file list">
+                    <span aria-hidden="true">↻</span>
+                </button>
+            </div>
+
+            <div class="search-wrap">
+                <span class="search-icon" aria-hidden="true">🔍</span>
+                <input type="search" id="searchInput" placeholder="Search files…" aria-label="Search files" autocomplete="off">
+                <kbd class="search-kbd" aria-hidden="true">Ctrl K</kbd>
+            </div>
+
+            <button id="newFileBtn" class="btn btn-primary btn-block" type="button">
+                <span aria-hidden="true">＋</span> New file
+            </button>
+
+            <div id="filesList" class="files-list" role="list" aria-live="polite">
+                <p class="empty-state">Loading…</p>
+            </div>
+        </aside>
+
+        <!-- Main panel: editor / viewer -->
+        <section class="panel" aria-label="Editor and viewer">
+            <div class="tabs" role="tablist">
+                <button class="tab is-active" id="tabEdit" role="tab" aria-selected="true" aria-controls="paneEdit" type="button">Edit</button>
+                <button class="tab" id="tabView" role="tab" aria-selected="false" aria-controls="paneView" type="button">View</button>
+            </div>
+
+            <!-- Edit pane -->
+            <div id="paneEdit" class="pane is-active" role="tabpanel" aria-labelledby="tabEdit">
+                <form id="saveForm" novalidate>
+                    <div class="field">
+                        <label for="filename">Filename</label>
+                        <input type="text" id="filename" placeholder="my-notes" autocomplete="off" required>
+                        <p class="hint" id="filenameHint">Saved as <code>my-notes.txt</code></p>
+                    </div>
+
+                    <div class="field field-grow">
+                        <div class="label-row">
+                            <label for="textContent">Content</label>
+                            <span class="counter" id="counter">0 characters</span>
+                        </div>
+                        <textarea id="textContent" placeholder="Start typing…  (Ctrl+S to save)" spellcheck="true" required></textarea>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" id="submitBtn" class="btn btn-primary">Save file</button>
+                        <button type="button" id="cancelEditBtn" class="btn btn-ghost" hidden>Cancel</button>
+                        <span class="spacer"></span>
+                        <span class="kbd-hint"><kbd>Ctrl</kbd>+<kbd>S</kbd></span>
+                    </div>
+                </form>
+            </div>
+
+            <!-- View pane -->
+            <div id="paneView" class="pane" role="tabpanel" aria-labelledby="tabView" hidden>
+                <div class="viewer-head">
+                    <h2 id="viewerTitle">No file selected</h2>
+                    <div class="viewer-actions">
+                        <button id="copyBtn" class="btn btn-ghost btn-sm" type="button" hidden>
+                            <span aria-hidden="true">📋</span> Copy
+                        </button>
+                        <button id="viewEditBtn" class="btn btn-ghost btn-sm" type="button" hidden>
+                            <span aria-hidden="true">✎</span> Edit
+                        </button>
+                        <button id="viewDownloadBtn" class="btn btn-ghost btn-sm" type="button" hidden>
+                            <span aria-hidden="true">⭳</span> Download
+                        </button>
+                    </div>
+                </div>
+                <pre id="fileViewer" class="viewer" tabindex="0">Select a file from the list to view its content.</pre>
+            </div>
+        </section>
+    </main>
+
+    <!-- Toast notifications -->
+    <div id="toasts" class="toasts" role="status" aria-live="polite"></div>
+
+    <!-- Confirmation dialog -->
+    <div id="confirmBackdrop" class="backdrop" hidden>
+        <div class="dialog" role="alertdialog" aria-modal="true" aria-labelledby="confirmTitle" aria-describedby="confirmBody">
+            <h2 id="confirmTitle">Delete file?</h2>
+            <p id="confirmBody">This cannot be undone.</p>
+            <div class="dialog-actions">
+                <button id="confirmCancel" class="btn btn-ghost" type="button">Cancel</button>
+                <button id="confirmOk" class="btn btn-danger" type="button">Delete</button>
+            </div>
         </div>
     </div>
 
