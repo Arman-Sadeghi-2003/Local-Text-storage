@@ -1,0 +1,111 @@
+/* Markdown
+   Rendered-markdown typography.
+
+   One of the stylesheets in assets/css. They are linked in order;
+   the cascade depends on it. */
+
+.btn.is-active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+}
+
+.viewer.markdown {
+    font-family: var(--font);
+    font-size: 15px;
+    line-height: 1.7;
+    white-space: normal;
+}
+.viewer.markdown[hidden] { display: none; }
+
+.markdown > *:first-child { margin-top: 0; }
+.markdown > *:last-child { margin-bottom: 0; }
+
+.markdown h1, .markdown h2, .markdown h3,
+.markdown h4, .markdown h5, .markdown h6 {
+    margin: 1.4em 0 .5em;
+    line-height: 1.3;
+    font-weight: 650;
+}
+.markdown h1 { font-size: 1.6em; }
+.markdown h2 { font-size: 1.35em; }
+.markdown h3 { font-size: 1.15em; }
+.markdown h4, .markdown h5, .markdown h6 { font-size: 1em; }
+
+.markdown p { margin: 0 0 1em; }
+.markdown ul, .markdown ol { margin: 0 0 1em 1.4em; }
+.markdown li { margin-bottom: .35em; }
+
+.markdown a { color: var(--accent); text-underline-offset: 2px; }
+
+.markdown code {
+    font-family: var(--mono);
+    font-size: .875em;
+    background: var(--surface-3);
+    padding: 2px 5px;
+    border-radius: 4px;
+}
+
+.markdown pre {
+    margin: 0 0 1em;
+    padding: 14px 16px;
+    background: var(--surface-3);
+    border-radius: var(--radius-sm);
+    overflow-x: auto;
+}
+.markdown pre code { background: none; padding: 0; font-size: 13px; }
+
+.markdown blockquote {
+    margin: 0 0 1em;
+    padding: 2px 0 2px 16px;
+    border-left: 3px solid var(--accent);
+    color: var(--text-dim);
+}
+
+.markdown hr {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 1.6em 0;
+}
+
+.markdown del { opacity: .7; }
+
+/* ---- GFM: tables and task lists ----
+   marked emits these; the previous renderer never did, so they are new. */
+
+.table-wrap {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    margin: 0 0 1em;
+}
+
+.markdown table {
+    width: max-content;
+    min-width: 100%;
+    border-collapse: collapse;
+    font-size: .92em;
+}
+
+.markdown th,
+.markdown td {
+    padding: 8px 12px;
+    border: 1px solid var(--border);
+    text-align: left;
+}
+
+.markdown th {
+    background: var(--surface-2);
+    font-weight: 650;
+}
+
+.markdown tbody tr:nth-child(even) { background: var(--surface-2); }
+
+/* Task lists sit flush rather than carrying a redundant bullet */
+.markdown li:has(> input[type="checkbox"]) { list-style: none; margin-left: -1.2em; }
+
+.markdown input[type="checkbox"] {
+    margin-right: .5em;
+    accent-color: var(--accent);
+    vertical-align: middle;
+}

@@ -1,2 +1,7 @@
+# Stored content — never versioned
 /datasets
-/datasets
+/datasets-trash
+
+# Local secrets and auth state
+/config.php
+/.auth
