@@ -1,0 +1,150 @@
+/* Auth
+   Sign-in and first-run setup gate.
+
+   One of the stylesheets in assets/css. They are linked in order;
+   the cascade depends on it. */
+
+.auth-gate { z-index: 80; }
+
+.auth-card {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    max-width: 400px;
+    text-align: center;
+}
+
+.auth-mark {
+    font-size: 30px;
+    line-height: 1;
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--accent-soft);
+}
+
+.auth-card h2 { margin-bottom: 0; }
+.auth-sub { margin-bottom: 4px; }
+
+.auth-card .field { text-align: left; }
+
+.auth-card input[type="password"] {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--surface-2);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 15px;
+    transition: border-color .15s, background .15s, box-shadow .15s;
+}
+.auth-card input[type="password"]:focus {
+    outline: none;
+    border-color: var(--accent);
+    background: var(--surface);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+.auth-error {
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+    background: var(--danger);
+    color: #fff;
+    font-size: 13px;
+    line-height: 1.5;
+    text-align: left;
+}
+.auth-error[hidden] { display: none; }
+
+.auth-link {
+    border: none;
+    background: none;
+    color: var(--text-dim);
+    font-family: inherit;
+    font-size: 13px;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 6px;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+.auth-link:hover { color: var(--accent); }
+
+/* ============================================
+   Admin panel
+   ============================================ */
+.admin-panel {
+    max-width: 460px;
+    text-align: left;
+    max-height: calc(100vh - 40px);
+    overflow-y: auto;
+}
+
+.admin-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 4px;
+}
+
+.admin-head h2 { margin-bottom: 0; }
+.admin-head .icon-btn { width: 32px; height: 32px; font-size: 14px; }
+
+.admin-section {
+    font-size: 13px;
+    font-weight: 650;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: var(--text-dim);
+    margin: 18px 0 12px;
+}
+
+#passwordForm { display: flex; flex-direction: column; gap: 14px; }
+#passwordForm .admin-section { margin-top: 12px; }
+
+.admin-panel input[type="password"] {
+    width: 100%;
+    padding: 11px 13px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--surface-2);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 15px;
+    transition: border-color .15s, background .15s, box-shadow .15s;
+}
+
+.admin-panel input[type="password"]:focus {
+    outline: none;
+    border-color: var(--accent);
+    background: var(--surface);
+    box-shadow: 0 0 0 3px var(--accent-soft);
+}
+
+/* Destructive half, fenced off from the routine one above */
+.admin-danger {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-top: 24px;
+    padding-top: 4px;
+    border-top: 1px solid var(--border);
+}
+
+.admin-danger .admin-section { color: var(--danger); }
+
+.admin-note {
+    font-size: 12.5px;
+    line-height: 1.6;
+    color: var(--text-dim);
+    padding: 11px 13px;
+    border-radius: var(--radius-sm);
+    background: var(--warn-soft);
+    border: 1px solid var(--warn);
+}

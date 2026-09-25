@@ -4,8 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="light dark">
+    <meta name="theme-color" content="#5b68e0">
+    <meta name="description" content="Store, search and version plain-text files in the browser or on your own server.">
     <title>Text File Storage</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+
+    <!-- Linked in cascade order; see assets/css/tokens.css -->
+    <link rel="stylesheet" href="assets/css/tokens.css">
+    <link rel="stylesheet" href="assets/css/layout.css">
+    <link rel="stylesheet" href="assets/css/panel.css">
+    <link rel="stylesheet" href="assets/css/markdown.css">
+    <link rel="stylesheet" href="assets/css/overlays.css">
+    <link rel="stylesheet" href="assets/css/components.css">
+    <link rel="stylesheet" href="assets/css/auth.css">
+    <link rel="stylesheet" href="assets/css/responsive.css">
+    <link rel="stylesheet" href="assets/css/print.css">
 </head>
 <body>
     <a class="skip-link" href="#main">Skip to content</a>
@@ -25,6 +39,12 @@
                 <button id="themeToggle" class="icon-btn" type="button" aria-label="Switch colour theme" title="Switch colour theme">
                     <span id="themeIcon" aria-hidden="true">🌙</span>
                 </button>
+                <button id="adminBtn" class="icon-btn" type="button" aria-label="Admin panel" title="Admin panel" hidden>
+                    <span aria-hidden="true">⚙</span>
+                </button>
+                <button id="logoutBtn" class="icon-btn" type="button" aria-label="Sign out" title="Sign out" hidden>
+                    <span aria-hidden="true">⏻</span>
+                </button>
             </div>
         </div>
     </header>
@@ -33,21 +53,72 @@
         <!-- Sidebar: file list -->
         <aside class="sidebar" aria-label="Saved files">
             <div class="sidebar-head">
-                <h2>Files <span id="fileCount" class="badge">0</span></h2>
-                <button id="refreshBtn" class="icon-btn" type="button" aria-label="Refresh file list" title="Refresh file list">
+                <div class="seg" role="tablist" aria-label="Which files to show">
+                    <button id="segFiles" class="seg-btn is-active" role="tab" aria-selected="true" type="button">
+                        Files <span id="fileCount" class="badge">0</span>
+                    </button>
+                    <button id="segTrash" class="seg-btn" role="tab" aria-selected="false" type="button">
+                        Trash <span id="trashCount" class="badge">0</span>
+                    </button>
+                </div>
+                <button id="refreshBtn" class="icon-btn" type="button" aria-label="Refresh list" title="Refresh list">
                     <span aria-hidden="true">↻</span>
                 </button>
             </div>
 
             <div class="search-wrap">
                 <span class="search-icon" aria-hidden="true">🔍</span>
-                <input type="search" id="searchInput" placeholder="Search files…" aria-label="Search files" autocomplete="off">
+                <input type="search" id="searchInput" placeholder="Search names, Enter for contents"
+                       aria-label="Search file names; press Enter to search inside files" autocomplete="off">
                 <kbd class="search-kbd" aria-hidden="true">Ctrl K</kbd>
+            </div>
+
+            <div class="list-controls" id="listControls">
+                <label class="sort-wrap">
+                    <span class="sort-label">Sort</span>
+                    <select id="sortSelect" aria-label="Sort files by">
+                        <option value="modified">Recently changed</option>
+                        <option value="name">Name</option>
+                        <option value="size">Size</option>
+                    </select>
+                </label>
+            </div>
+
+            <div id="tagBar" class="tag-bar" hidden></div>
+
+            <div id="searchBanner" class="search-banner" hidden>
+                <span id="searchBannerText"></span>
+                <button id="searchClearBtn" class="row-btn" type="button" aria-label="Clear content search">✕</button>
             </div>
 
             <button id="newFileBtn" class="btn btn-primary btn-block" type="button">
                 <span aria-hidden="true">＋</span> New file
             </button>
+
+            <div class="sidebar-tools" id="sidebarTools">
+                <button id="importBtn" class="btn btn-ghost btn-sm" type="button" title="Import .txt files or a bundle">
+                    <span aria-hidden="true">⭱</span> Import
+                </button>
+                <button id="exportBtn" class="btn btn-ghost btn-sm" type="button" title="Download every file as a bundle">
+                    <span aria-hidden="true">⭳</span> Export
+                </button>
+                <button id="selectBtn" class="btn btn-ghost btn-sm" type="button" title="Select several files">
+                    <span aria-hidden="true">☑</span> Select
+                </button>
+            </div>
+
+            <input type="file" id="fileInput" multiple hidden
+                   accept=".txt,.json,.md,text/plain,application/json">
+
+            <div id="bulkBar" class="bulk-bar" hidden>
+                <span id="bulkCount">0 selected</span>
+                <span class="bulk-actions">
+                    <button id="bulkAllBtn" class="row-btn" type="button" title="Select all">All</button>
+                    <button id="bulkExportBtn" class="row-btn" type="button" title="Export selected">⭳</button>
+                    <button id="bulkDeleteBtn" class="row-btn danger" type="button" title="Delete selected">🗑</button>
+                    <button id="bulkCancelBtn" class="row-btn" type="button" title="Cancel selection">✕</button>
+                </span>
+            </div>
 
             <div id="filesList" class="files-list" role="list" aria-live="polite">
                 <p class="empty-state">Loading…</p>
@@ -64,16 +135,27 @@
             <!-- Edit pane -->
             <div id="paneEdit" class="pane is-active" role="tabpanel" aria-labelledby="tabEdit">
                 <form id="saveForm" novalidate>
-                    <div class="field">
-                        <label for="filename">Filename</label>
-                        <input type="text" id="filename" placeholder="my-notes" autocomplete="off" required>
-                        <p class="hint" id="filenameHint">Saved as <code>my-notes.txt</code></p>
+                    <div class="field-pair">
+                        <div class="field">
+                            <label for="filename">Title</label>
+                            <input type="text" id="filename" placeholder="Q3 planning (draft)" autocomplete="off" required>
+                            <p class="hint" id="filenameHint">Stored as <code>q3_planning_draft.txt</code></p>
+                        </div>
+
+                        <div class="field">
+                            <label for="tagsInput">Tags</label>
+                            <input type="text" id="tagsInput" placeholder="work, planning" autocomplete="off">
+                            <p class="hint">Comma separated, up to 10</p>
+                        </div>
                     </div>
 
                     <div class="field field-grow">
                         <div class="label-row">
                             <label for="textContent">Content</label>
-                            <span class="counter" id="counter">0 characters</span>
+                            <span class="meta-row">
+                                <span class="draft-status" id="draftStatus" hidden>Draft saved</span>
+                                <span class="counter" id="counter">0 characters</span>
+                            </span>
                         </div>
                         <textarea id="textContent" placeholder="Start typing…  (Ctrl+S to save)" spellcheck="true" required></textarea>
                     </div>
@@ -101,15 +183,155 @@
                         <button id="viewDownloadBtn" class="btn btn-ghost btn-sm" type="button" hidden>
                             <span aria-hidden="true">⭳</span> Download
                         </button>
+                        <button id="historyBtn" class="btn btn-ghost btn-sm" type="button" hidden aria-expanded="false">
+                            <span aria-hidden="true">🕘</span> History
+                        </button>
+                        <button id="markdownBtn" class="btn btn-ghost btn-sm" type="button" hidden aria-pressed="false">
+                            <span aria-hidden="true">📝</span> Markdown
+                        </button>
                     </div>
                 </div>
+
+                <div id="versionPanel" class="version-panel" hidden>
+                    <div id="versionList" class="version-list"></div>
+                </div>
+
+                <div id="versionBanner" class="version-banner" hidden>
+                    <span id="versionBannerText"></span>
+                    <span class="version-banner-actions">
+                        <button id="versionRestoreBtn" class="btn btn-primary btn-sm" type="button">Restore this version</button>
+                        <button id="versionBackBtn" class="btn btn-ghost btn-sm" type="button">Back to current</button>
+                    </span>
+                </div>
+
                 <pre id="fileViewer" class="viewer" tabindex="0">Select a file from the list to view its content.</pre>
+                <div id="markdownView" class="viewer markdown" tabindex="0" hidden></div>
             </div>
         </section>
     </main>
 
+    <!-- Sign in. One password field, always: creating and changing a password
+         belong to the setup screen and the admin panel respectively. -->
+    <div id="authGate" class="backdrop auth-gate" hidden>
+        <form id="authForm" class="dialog auth-card" autocomplete="on" novalidate>
+            <div class="auth-mark" aria-hidden="true">🔒</div>
+            <h2>Sign in</h2>
+            <p class="auth-sub">Enter your password to access your files.</p>
+
+            <div class="field">
+                <label for="authPassword">Password</label>
+                <input type="password" id="authPassword" autocomplete="current-password" required>
+            </div>
+
+            <p id="authError" class="auth-error" role="alert" hidden></p>
+
+            <button type="submit" id="authSubmit" class="btn btn-primary btn-block">Sign in</button>
+
+            <button type="button" id="authLocalBtn" class="auth-link">
+                Continue without signing in — files stay in this browser
+            </button>
+        </form>
+    </div>
+
+    <!-- First run only: no password exists yet, so there is nowhere else to
+         create one. Shown instead of the sign-in card, never alongside it. -->
+    <div id="setupGate" class="backdrop auth-gate" hidden>
+        <form id="setupForm" class="dialog auth-card" autocomplete="on" novalidate>
+            <div class="auth-mark" aria-hidden="true">🔐</div>
+            <h2>Create a password</h2>
+            <p class="auth-sub">This server has no password yet. Choose one to protect the files stored on it.</p>
+
+            <div class="field">
+                <label for="setupPassword">New password</label>
+                <input type="password" id="setupPassword" autocomplete="new-password" required>
+                <p class="hint">At least 8 characters</p>
+            </div>
+
+            <div class="field">
+                <label for="setupConfirm">Confirm password</label>
+                <input type="password" id="setupConfirm" autocomplete="new-password" required>
+            </div>
+
+            <p id="setupError" class="auth-error" role="alert" hidden></p>
+
+            <button type="submit" id="setupSubmit" class="btn btn-primary btn-block">Create password</button>
+
+            <button type="button" id="setupLocalBtn" class="auth-link">
+                Continue without a password — files stay in this browser
+            </button>
+        </form>
+    </div>
+
+    <!-- Admin panel: where a password is changed or removed -->
+    <div id="adminBackdrop" class="backdrop" hidden>
+        <div class="dialog admin-panel" role="dialog" aria-modal="true" aria-labelledby="adminTitle">
+            <div class="admin-head">
+                <h2 id="adminTitle">Admin</h2>
+                <button id="adminCloseBtn" class="icon-btn" type="button" aria-label="Close admin panel">
+                    <span aria-hidden="true">✕</span>
+                </button>
+            </div>
+
+            <form id="passwordForm" autocomplete="on" novalidate>
+                <h3 class="admin-section">Change password</h3>
+
+                <div class="field">
+                    <label for="adminCurrent">Current password</label>
+                    <input type="password" id="adminCurrent" autocomplete="current-password" required>
+                </div>
+
+                <div class="field">
+                    <label for="adminNew">New password</label>
+                    <input type="password" id="adminNew" autocomplete="new-password" required>
+                    <p class="hint">At least 8 characters</p>
+                </div>
+
+                <div class="field">
+                    <label for="adminConfirm">Confirm new password</label>
+                    <input type="password" id="adminConfirm" autocomplete="new-password" required>
+                </div>
+
+                <p id="adminError" class="auth-error" role="alert" hidden></p>
+
+                <button type="submit" id="adminSubmit" class="btn btn-primary btn-block">Change password</button>
+            </form>
+
+            <div class="admin-danger">
+                <h3 class="admin-section">Remove password</h3>
+                <p class="admin-note">
+                    This signs everyone out and leaves the server unclaimed. Your files stay
+                    where they are, but the next person to open the app can set a new password
+                    and reach all of them. Only do this if nobody else can reach this server.
+                </p>
+
+                <div class="field">
+                    <label for="adminRemovePassword">Confirm with your current password</label>
+                    <input type="password" id="adminRemovePassword" autocomplete="current-password">
+                </div>
+
+                <p id="adminRemoveError" class="auth-error" role="alert" hidden></p>
+
+                <button id="adminRemoveBtn" class="btn btn-danger btn-block" type="button">Remove password</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast notifications -->
     <div id="toasts" class="toasts" role="status" aria-live="polite"></div>
+
+    <!-- Conflict resolution -->
+    <div id="conflictBackdrop" class="backdrop" hidden>
+        <div class="dialog" role="alertdialog" aria-modal="true" aria-labelledby="conflictTitle" aria-describedby="conflictBody">
+            <h2 id="conflictTitle">This file changed elsewhere</h2>
+            <p id="conflictBody">Someone else saved it while you were editing.</p>
+            <div class="dialog-actions dialog-actions-stack">
+                <button id="conflictMine" class="btn btn-primary" type="button">Keep my version</button>
+                <button id="conflictTheirs" class="btn btn-ghost" type="button">Use the saved version</button>
+                <button id="conflictBoth" class="btn btn-ghost" type="button">Open both</button>
+                <button id="conflictCancel" class="btn btn-ghost" type="button">Cancel</button>
+            </div>
+        </div>
+    </div>
 
     <!-- Confirmation dialog -->
     <div id="confirmBackdrop" class="backdrop" hidden>
@@ -123,6 +345,28 @@
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <!--
+        Classic scripts in dependency order, not ES modules: modules are
+        blocked by CORS on file://, and opening index.html straight from
+        disk is a supported way to run this app. core.js must come first
+        and app.js last.
+    -->
+    <!-- marked v15 (MIT), vendored from the MarkdownReader project. It does
+         not sanitise, so assets/js/markdown.js filters its output. -->
+    <script src="assets/vendor/marked.min.js"></script>
+
+    <script src="assets/js/core.js"></script>
+    <script src="assets/js/stores.js"></script>
+    <script src="assets/js/boot.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/ui.js"></script>
+    <script src="assets/js/list.js"></script>
+    <script src="assets/js/viewer.js"></script>
+    <script src="assets/js/editor.js"></script>
+    <script src="assets/js/drafts.js"></script>
+    <script src="assets/js/actions.js"></script>
+    <script src="assets/js/transfer.js"></script>
+    <script src="assets/js/markdown.js"></script>
+    <script src="assets/js/app.js"></script>
 </body>
 </html>

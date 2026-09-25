@@ -1,0 +1,19 @@
+{
+  "name": "Text File Storage",
+  "short_name": "Text Storage",
+  "description": "Store, search and version plain-text files in the browser or on your own server.",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#eef1f8",
+  "theme_color": "#5b68e0",
+  "icons": [
+    {
+      "src": "assets/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

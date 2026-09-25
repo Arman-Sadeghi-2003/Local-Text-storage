@@ -1,0 +1,28 @@
+/* Responsive
+   Breakpoints and reduced-motion.
+
+   One of the stylesheets in assets/css. They are linked in order;
+   the cascade depends on it. */
+
+@media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; }
+    .sidebar { position: static; max-height: none; }
+    .files-list { max-height: 320px; }
+    .panel { min-height: 460px; }
+}
+
+@media (max-width: 620px) {
+    .topbar { padding: 16px 14px 0; }
+    .layout { padding: 0 14px; margin-top: 16px; gap: 14px; }
+    .brand h1 { font-size: 1.2rem; }
+    .topbar-inner { gap: 10px; }
+    .mode-pill { font-size: 12px; padding: 6px 11px; }
+    .sidebar, .pane { padding: 14px; }
+    .search-kbd, .kbd-hint { display: none; }
+    .search-wrap input { padding-right: 34px; }
+    .tab { padding: 10px 14px; flex: 1; }
+    .field-pair { grid-template-columns: 1fr; gap: 14px; }
+    .form-actions .btn { flex: 1; }
+    .file-item .row-actions { opacity: 1; }
+    .toasts { right: 12px; left: 12px; bottom: 12px; max-width: none; }
+}

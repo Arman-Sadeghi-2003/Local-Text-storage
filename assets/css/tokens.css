@@ -1,0 +1,87 @@
+/* Tokens
+   Design tokens, reset, and base element styling.
+
+   One of the stylesheets in assets/css. They are linked in order;
+   the cascade depends on it. */
+
+:root {
+    --bg: #eef1f8;
+    --bg-grad-a: #667eea;
+    --bg-grad-b: #764ba2;
+    --surface: #ffffff;
+    --surface-2: #f6f7fb;
+    --surface-3: #eceffa;
+    --border: #dfe3ee;
+    --text: #1e2233;
+    --text-dim: #6b7285;
+    --accent: #5b68e0;
+    --accent-hover: #4a56c9;
+    --accent-soft: #eaecfd;
+    --danger: #d64550;
+    --danger-hover: #bb3b45;
+    --success: #1f9254;
+    --success-soft: #e3f6ec;
+    --warn: #b07500;
+    --warn-soft: #fdf3dd;
+    --radius: 12px;
+    --radius-sm: 8px;
+    --shadow: 0 1px 2px rgba(20, 25, 50, .06), 0 8px 24px rgba(20, 25, 50, .08);
+    --shadow-lg: 0 12px 40px rgba(20, 25, 50, .22);
+    --font: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    --mono: ui-monospace, 'Cascadia Mono', Consolas, 'Courier New', monospace;
+}
+
+:root[data-theme="dark"] {
+    --bg: #12141c;
+    --bg-grad-a: #2b2f52;
+    --bg-grad-b: #3d2a55;
+    --surface: #1b1e28;
+    --surface-2: #21252f;
+    --surface-3: #272b38;
+    --border: #313644;
+    --text: #e8eaf2;
+    --text-dim: #9aa1b4;
+    --accent: #7b86ef;
+    --accent-hover: #8f99f5;
+    --accent-soft: #262a44;
+    --danger: #e26670;
+    --danger-hover: #ef7c86;
+    --success: #4cc084;
+    --success-soft: #16301f;
+    --warn: #e0aa42;
+    --warn-soft: #322a16;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 8px 24px rgba(0, 0, 0, .35);
+    --shadow-lg: 0 12px 40px rgba(0, 0, 0, .6);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+    font-family: var(--font);
+    color: var(--text);
+    background:
+        linear-gradient(135deg, var(--bg-grad-a) 0%, var(--bg-grad-b) 100%) no-repeat top / 100% 220px,
+        var(--bg);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+.skip-link {
+    position: absolute;
+    left: -9999px;
+    top: 8px;
+    background: var(--surface);
+    color: var(--text);
+    padding: 10px 16px;
+    border-radius: var(--radius-sm);
+    z-index: 100;
+}
+.skip-link:focus { left: 8px; }
